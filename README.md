@@ -49,3 +49,6 @@ their official website if you want acquire their latest versions:
     is an R package used for the these differential abundance methods
     and the graphical illustration of the differentially active
     microbial metabolic pathways.
+
+Each package has his own requirements and the installation method is explained
+in more detail in the provided link.
