@@ -27,8 +27,6 @@
 #' chimera-filtered sequence of each OTU
 #' 
 #' @return OTU_filtered_table.qza QIIME2 artifact with the OTU filtered counts
-#' 
-#' 
 
 # Variables definition
 QC_table=""
