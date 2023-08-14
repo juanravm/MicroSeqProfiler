@@ -7,7 +7,7 @@ exploration of microbiome data based on 16S ribosomal RNA marker genes.
 This package provides a complete and efficient solution for researchers to 
 understand the composition and diversity of microbial communities present 
 in different biological groups, by compiling a variety of previously 
-developed.
+developed tools.
 
 With *MicroSeqProfiler*, you can perform comprehensive analyses of 16S RNA 
 sequencing data, describing and quantifying the microbial species present
