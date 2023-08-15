@@ -15,6 +15,8 @@
 #' @return QC-table.qza QIIME2 artifact with the counts of each unique 
 #' sequence
 #' @return QC-stats.qza QIIME2 artifact with the QC statistics
+#' 
+#' 
 
 # Variables definition
 input_path=""

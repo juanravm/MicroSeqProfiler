@@ -5,7 +5,7 @@
 #' @param QC_table QIIME2 FeatureTable[Frequency] artifact with 
 #' QC read counts
 #' 
-#' #' @param QC_seqs QIIME2 FeatureData[Sequence] artifact with QC rep-seqs
+#' @param QC_seqs QIIME2 FeatureData[Sequence] artifact with QC rep-seqs
 #' 
 #' @param perc_identity Identity percentage to cluster OTUs: From 0 to 1
 #' 
@@ -20,13 +20,16 @@
 #' 
 #' @param metadata Metadata file path
 #' 
-#' @return taxa-barplot QIIME2 visualization with taxonomic composition of
+#' @return taxa_barplot.qzv QIIME2 visualization with taxonomic composition of
 #' samples
 #' 
 #' @return OTU_filtered_seqs.qza QIIME2 artifact with the representative
 #' chimera-filtered sequence of each OTU
 #' 
-#' @return OTU_filtered_table.qza QIIME2 artifact with the OTU filtered counts
+#' @return OTU_filtered_table.qza QIIME2 artifact with the filtered OTU counts
+#' 
+#' @return OTU_filtered_table.tsv OTU filtered counts in .tsv format
+
 
 # Variables definition
 QC_table=""
@@ -74,7 +77,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo "Opción inválida: $1"
+            echo "Error in option: $1"
             exit 1
             ;;
     esac
@@ -115,6 +118,19 @@ qiime feature-table filter-seqs \
   --m-metadata-file intermediate/chimera_filter/chimeras.qza \
   --p-exclude-ids \
   --o-filtered-data OTU_filtered_seqs.qza
+
+## QIIME2 OTU table export
+qiime tools export \
+--input-path OTU_filtered_table.qza \
+--output-path intermediate
+
+biom convert \
+-i intermediate/feature-table.biom \
+-o intermediate/OTU_filtered_table.tsv \
+--to-tsv
+
+sed -i '1d' intermediate/OTU_filtered_table.tsv
+rm intermediate/feature-table.biom
 
 #···················· TAXONOMIC CLASSIFICATION
 
@@ -159,4 +175,4 @@ qiime taxa barplot \
 --i-table OTU_filtered_table.qza \
 --i-taxonomy intermediate/taxonomy.qza \
 --m-metadata-file $metadata \
---o-visualization taxa-barplots.qzv
+--o-visualization taxa_barplots.qzv
