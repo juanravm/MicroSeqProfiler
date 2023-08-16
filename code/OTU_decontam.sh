@@ -19,8 +19,6 @@
 #'  
 #' @return species.tsv File with the chimera-filtered and decontaminated 
 #' OTU counts in .tsv format
-#' 
-#' @return OTU_filtered_table.qza QIIME2 artifact with the filtered OTU counts
 
 # Variables definition
 OTU_filtered_table=""
