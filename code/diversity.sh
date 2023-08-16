@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #' Microbiome alpha and beta diversity metrics analysis
 #'
 #' @param OTU_filtered_seqs OTU_rep_seqs.qza QIIME2 artifact with the 
@@ -111,6 +110,7 @@ qiime feature-table filter-samples \
   --p-where "$controls" \
   --o-filtered-table intermediate/aligned_OTU_table.qza
 
+#···················· DIVERSITY METRICS CALCULATION
 ## Generating diversity metrics
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny intermediate/rooted_tree.qza \
@@ -120,13 +120,61 @@ qiime diversity core-metrics-phylogenetic \
   --output-dir diversity \
   --p-n-jobs-or-threads $cores
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-### ALPHA DIVERSITY
-
 # Moving diversity metrics
 cd diversity
 mkdir alpha
 mkdir beta
 mv  *faith* *evenness* *shannon* ./alpha
 mv *jaccard* *bray* *unweighted* *weighted* ./beta
-cd ..
+
+## Exporting alpha diversity metrics to .tsv
+cd alpha
+
+qiime tools export \
+--input-path faith_pd_vector.qza \
+--output-path .
+
+mv alpha-diversity.tsv faith_pd.tsv 
+
+qiime tools export \
+--input-path evenness_vector.qza \
+--output-path .
+
+mv alpha-diversity.tsv evenness_pd.tsv 
+
+qiime tools export \
+--input-path shannon_vector.qza \
+--output-path .
+
+mv alpha-diversity.tsv shannon.tsv 
+
+mkdir Visualizations
+
+## Exporting beta diversity metrics to .tsv
+cd ../beta/
+  
+qiime tools export \
+--input-path bray_curtis_distance_matrix.qza \
+--output-path .
+
+mv distance-matrix.tsv bray_curtis.tsv 
+
+qiime tools export \
+--input-path jaccard_distance_matrix.qza \
+--output-path .
+
+mv distance-matrix.tsv jaccard.tsv 
+
+qiime tools export \
+--input-path unweighted_unifrac_distance_matrix.qza \
+--output-path .
+
+mv distance-matrix.tsv unweighted.tsv 
+
+qiime tools export \
+--input-path weighted_unifrac_distance_matrix.qza \
+--output-path .
+
+mv distance-matrix.tsv weighted.tsv 
+
+mkdir Visualizations
