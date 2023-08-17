@@ -1,24 +1,17 @@
 #!/bin/bash
 #' OTU decontamination (Negative control normalization)
 #'
-#' @param decontam_OTU_table decontam_OTU_table.qza QIIME2 artifact file path 
+#' @param OTU_table_fp decontam_OTU_table.qza QIIME2 artifact file path 
 #' with decontaminated OTU counts
 #' 
-#' @param OTU_filtered_seqs OTU_filtered_seqs.qza QIIME2 artifact file path 
+#' @param OTU_seq_fp OTU_filtered_seqs.qza QIIME2 artifact file path 
 #' with chimera filtered sequences
 #' 
-#' @param  output_dir Decontaminated OTU table output directory
-#' (usually the previous microbiome working directory employed)
+#' @param  cores Number of processor cores available to the program
 #' 
-#' @param metadata Metadata file path
-#' 
-#' @param taxonomy taxonomy.qza file path
-#' 
-#' @return decontam_OTU_table.qza QIIME2 artifact with the chimera-filtered 
-#' and decontaminated OTU counts
-#'  
-#' @return species.tsv File with the chimera-filtered and decontaminated 
-#' OTU counts in .tsv format
+#' @return output Directory with the inferred metabolic pathways matrix to
+#' KEGG Orthologs, EC and MetaCyc for each sample
+
 
 # Variables definition
 OTU_table_fp=""
