@@ -3,32 +3,29 @@
 #'
 #' @param species_fp species.qza QIIME2 artifact file path
 #' 
-#' @param neg A character pattern to identify negative controls in
-#' OTU table rownames
+#' @param metadata_fp Metadata file path 
 #' 
-#' @param  output_dir Decontaminated OTU table output directory
-#' (usually the previous microbiome working directory employed)
+#' @param  sampling Minimum sampling depth for LEfSe analysis
 #' 
-#' @param metadata_fp Metadata file path
+#' @param col Metadata column name of compared groups
 #' 
-#' @param taxonomy taxonomy.qza file path
+#' @param ref_group Reference group for LEfSe analysis
 #' 
-#' @return decontam_OTU_table.qza QIIME2 artifact with the chimera-filtered 
-#' and decontaminated OTU counts
+#' @param group2 Second group in LEfSe analysis
 #'  
-#' @return species.tsv File with the chimera-filtered and decontaminated 
-#' OTU counts in .tsv format
+#' @param minimum_LDA Minimum LDA score for showing in .tsv output
+#'  
+#' @return LEfSe_output.tsv Output with significant microorganisms
+#' LDA score 
 
 # Variables definition
 species_fp=""
-neg=""
-output_dir=""
 metadata_fp=""
-taxonomy=""
 sampling=""
 col=""
 ref_group=""
 group2=""
+minimum_LDA=""
 
 
 # Argument assign to variables
@@ -60,12 +57,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
-echo "OTU table file path: $OTU_filtered_table"
-echo "Output directory: $output_dir"
-echo "Metadata file path: $metadata_fp"
-echo "Negative control identification pattern: $neg"
-echo "taxonomy.qza file path: $taxonomy"
 
 # Exporting species composition
 qiime tools export \
@@ -106,7 +97,7 @@ sampling_depth <- sampling_depth > $sampling
 comparison <- comparison[, sampling_depth]
 
 # Metadata information
-group <- metadata[, col][match(colnames(comparison), metadata[,1])]
+group <- metadata[, $col][match(colnames(comparison), metadata[,1])]
 group <- factor(group, levels = c("$ref_group", "$group2"))
 
 # Per sample normalization to 1M reads (as Galaxy does)
@@ -125,7 +116,7 @@ Lefse<-lefser(
   expr = comparison,
   kruskal.threshold = 0.05,
   wilcox.threshold = 0.05,
-  lda.threshold = 2,
+  lda.threshold = $minimum_LDA,
   groupCol = "grupo",
   blockCol = NULL,
   assay = 1,
