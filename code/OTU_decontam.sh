@@ -7,7 +7,7 @@
 #' @param neg A character pattern to identify negative controls in
 #' OTU table rownames
 #' 
-#' @param  decontam_OTU_table Decontaminated OTU table output directory
+#' @param  output_dir Decontaminated OTU table output directory
 #' (usually the previous microbiome working directory employed)
 #' 
 #' @param metadata Metadata file path
@@ -23,7 +23,7 @@
 # Variables definition
 OTU_filtered_table=""
 neg=""
-decontam_OTU_table=""
+output_dir=""
 metadata=""
 taxonomy=""
 
@@ -38,8 +38,8 @@ while [[ $# -gt 0 ]]; do
             neg="$2"
             shift 2
             ;;
-        --decontam_OTU_table)
-            decontam_OTU_table="$2"
+        --output_dir)
+            output_dir="$2"
             shift 2
             ;;
         --metadata)
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "OTU table file path: $OTU_filtered_table"
-echo "Output directory: $decontam_OTU_table"
+echo "Output directory: $output_dir"
 echo "Metadata file path: $metadata"
 echo "Negative control identification pattern: $neg"
 echo "taxonomy.qza file path: $taxonomy"
@@ -98,51 +98,54 @@ noncontam_export <- OTU_table[!neg ,]
 write.csv(t(noncontam_export),
           row.names = T, 
           col.names = T, 
-          file = "$decontam_OTU_table/decontam_OTU_table.csv")
+          file = "$output_dir/decontam_OTU_table.csv")
 
 RSCRIPT
 
 # Modifying .csv to .tsv for importing
-sed -e 's/,/\t/g' $decontam_OTU_table/decontam_OTU_table.csv > $decontam_OTU_table/decontam_OTU_table.tsv
-sed -i '1s/^\t/#OTU ID\t/' $decontam_OTU_table/intermediate/decontam_OTU_table.tsv
-rm $decontam_OTU_table/decontam_OTU_table.csv
+sed -e 's/,/\t/g' $output_dir/decontam_OTU_table.csv > $output_dir/decontam_OTU_table.tsv
+sed -i '1s/^\t/#OTU ID\t/' $output_dir/intermediate/decontam_OTU_table.tsv
+rm $output_dir/decontam_OTU_table.csv
 
 # .tsv to BIOM
 biom convert \
--i $decontam_OTU_table/intermediate/decontam_OTU_table.tsv \
--o $decontam_OTU_table/intermediate/decontam_OTU_table.biom \
+-i $output_dir/intermediate/decontam_OTU_table.tsv \
+-o $output_dir/intermediate/decontam_OTU_table.biom \
 -m $metadata \
 --table-type="OTU table" \
 --to-hdf5
 
 ## Importing decontaminated FeatureTable[Frequency] to QIIME2
 qiime tools import \
---input-path $decontam_OTU_table/decontam_OTU_table.biom \
+--input-path $output_dir/decontam_OTU_table.biom \
 --type 'FeatureTable[Frequency]' \
 --input-format BIOMV210Format \
---output-path $decontam_OTU_table/decontam_OTU_table.qza
+--output-path $output_dir/decontam_OTU_table.qza
 
-rm $decontam_OTU_table/intermediate/decontam_OTU_table.biom
+rm $output_dir/intermediate/decontam_OTU_table.biom
 
 # Species taxa collapse
 qiime taxa collapse \
-    --i-table $decontam_OTU_table/decontam_OTU_table.qza \
+    --i-table $output_dir/decontam_OTU_table.qza \
     --i-taxonomy $taxonomy \
     --p-level 7 \
-    --o-collapsed-table $decontam_OTU_table/species.qza
+    --o-collapsed-table $output_dir/species.qza
 
+qiime composition add-pseudocount \
+  --i-table $output_dir/species.qza \
+  --o-composition-table $output_dir/species.qza
+  
 qiime tools export \
-   --input-path $decontam_OTU_table/species.qza \
-   --output-path $decontam_OTU_table
+   --input-path $output_dir/species.qza \
+   --output-path $output_dir
 
-rm $decontam_OTU_table/species.qza
 
 # Convert biom format to tsv
 biom convert \
--i $decontam_OTU_table/feature-table.biom \
+-i $output_dir/feature-table.biom \
 -m $metadata \
--o $decontam_OTU_table/species.txt \
+-o $output_dir/species.txt \
 --to-tsv
 
-rm $decontam_OTU_table/feature-table.biom
-mv $decontam_OTU_table/species.txt $decontam_OTU_table/species.tsv
+rm $output_dir/feature-table.biom
+mv $output_dir/species.txt $output_dir/species.tsv
