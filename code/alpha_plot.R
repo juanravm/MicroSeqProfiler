@@ -7,13 +7,13 @@
 #'  
 #' @param faith_fp faith_pd.tsv file path
 #' 
-#' @param metadata_fp metadata.tsv file pach
+#' @param metadata_fp metadata.tsv file path
 #' 
 #' @param col metadata column with the group of samples to compare
 #' 
-#' @param output_dir Output directory (Visualizations directory)
+#' @param output_dir Output directory (Alpha Visualizations directory)
 #' 
-#' @return alpha diversity visualizations and comparisons significance
+#' @return Visualizations diversity visualizations and comparisons significance
 #' by Kruskal-Wallis statistical test
 
 #···················· ALPHA DIVERSITY PLOTTING
@@ -92,7 +92,7 @@ faith_pval <- data.frame(group1=levels(faith.pd[,Group])[group1],
                             p_values1=p_values1)
 
 write.csv(faith_pval, 
-          file = paste(visualization_fp, "/faith_pval.csv"), 
+          file = paste(output_dir, "/faith_pval.csv"), 
           row.names = T, 
           col.names = T)
 
@@ -118,7 +118,7 @@ evenness_pval <- data.frame(group1=levels(evenness.pd[,Group])[group1],
                          p_values1=p_values1)
 
 write.csv(evenness_pval, 
-          file = paste(visualization_fp, "/evenness_pval.csv"), 
+          file = paste(output_dir, "/evenness_pval.csv"), 
           row.names = T, 
           col.names = T)
 
@@ -144,7 +144,7 @@ shannon_pval <- data.frame(group1=levels(shannon[,Group])[group1],
                             p_values1=p_values1)
 
 write.csv(shannon_pval, 
-          file = paste(visualization_fp, "/shannon_pval.csv"), 
+          file = paste(output_dir, "/shannon_pval.csv"), 
           row.names = T, 
           col.names = T)
 
