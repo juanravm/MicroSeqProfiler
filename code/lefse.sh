@@ -35,20 +35,28 @@ while [[ $# -gt 0 ]]; do
             species_fp="$2"
             shift 2
             ;;
-        --neg)
-            neg="$2"
-            shift 2
-            ;;
-        --output_dir)
-            output_dir="$2"
-            shift 2
-            ;;
         --metadata_fp)
             metadata_fp="$2"
             shift 2
             ;;
-        --taxonomy)
-            taxonomy="$2"
+        --sampling)
+            sampling="$2"
+            shift 2
+            ;;
+        --col)
+            col="$2"
+            shift 2
+            ;;
+        --ref_group)
+            ref_group="$2"
+            shift 2
+            ;;
+        --group2)
+            group2="$2"
+            shift 2
+            ;;
+        --minimum_LDA)
+            minimum_LDA="$2"
             shift 2
             ;;
         *)
