@@ -18,6 +18,7 @@ OTU_table_fp=""
 OTU_seq_fp=""
 cores=""
 
+
 # Argument assign to variables
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -51,12 +52,12 @@ cd picrust2/
 #QIIME2 exporting sequences and feature-table :
 # input for Picrust2
 qiime tools export \
---input-path $OTU_seq_fp \
+--input-path "$OTU_seq_fp" \
 --output-path ./input
 fasta="'$(realpath input/dna-sequences.fasta)'"
 
 qiime tools export \
---input-path $OTU_table_fp \
+--input-path "$OTU_table_fp" \
 --output-path ./input
 biom="'$(realpath input/feature-table.biom)'"
 
@@ -67,11 +68,11 @@ pip install --editable .
 
 ## Run picrust2_pipeline.py downloaded in scripts folder
 cd scripts
-python picrust2_pipeline.py -s  $fasta \
--i $biom \
+python picrust2_pipeline.py -s  "$fasta" \
+-i "$biom" \
 -o ../output \
 -t sepp \
--p $cores \
+-p "$cores" \
 -e 0 \
 --verbose
 

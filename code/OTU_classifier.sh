@@ -18,7 +18,7 @@
 #' 
 #' @param class_tax Taxonomy associated to classifier references
 #' 
-#' @param metadata Metadata file path
+#' @param metadata_fp metadata_fp file path
 #' 
 #' @return taxa_barplot.qzv QIIME2 visualization with taxonomic composition of
 #' samples
@@ -39,7 +39,7 @@ f_primer=""
 r_primer=""
 class_seq=""
 class_tax=""
-metadata=""
+metadata_fp=""
 
 # Argument assign to variables
 while [[ $# -gt 0 ]]; do
@@ -72,8 +72,8 @@ while [[ $# -gt 0 ]]; do
             class_tax="$2"
             shift 2
             ;;
-        --metadata)
-            metadata="$2"
+        --metadata_fp)
+            metadata_fp="$2"
             shift 2
             ;;
         *)
@@ -89,8 +89,8 @@ echo "Identity for clustering: $perc_identity"
 echo "Forward primer sequence: $f_primer"
 echo "Reverse primer sequence: $r_primer"
 echo "Reference classifier seqs file path: $class_seq"
-echo "Reference classifier taxa file path: $class_taxa"
-echo "Metadata file path: $class_seq"
+echo "Reference classifier taxa file path: $class_tax"
+echo "metadata_fp file path: $metadata_fp"
 
 #···················· CLUSTERING OTUS
 ## 99% Identity clustering sequences: 
@@ -122,15 +122,15 @@ qiime feature-table filter-seqs \
 ## QIIME2 OTU table export
 qiime tools export \
 --input-path OTU_filtered_table.qza \
---output-path intermediate
+--output-path .
 
 biom convert \
--i intermediate/feature-table.biom \
--o intermediate/OTU_filtered_table.tsv \
+-i feature-table.biom \
+-o OTU_filtered_table.tsv \
 --to-tsv
 
-sed -i '1d' intermediate/OTU_filtered_table.tsv
-rm intermediate/feature-table.biom
+sed -i '1d' OTU_filtered_table.tsv
+rm feature-table.biom
 
 #···················· TAXONOMIC CLASSIFICATION
 
@@ -142,7 +142,7 @@ qiime tools import \
 
 # Taxonomy import
 qiime tools import \
---type 'FeatureData[Taxonomy]' \
+--type FeatureData[Taxonomy] \
 --input-format HeaderlessTSVTaxonomyFormat \
 --input-path $class_tax \
 --output-path intermediate/ref-taxonomy.qza
@@ -174,5 +174,5 @@ qiime metadata tabulate \
 qiime taxa barplot \
 --i-table OTU_filtered_table.qza \
 --i-taxonomy intermediate/taxonomy.qza \
---m-metadata-file $metadata \
+--m-metadata-file $metadata_fp \
 --o-visualization taxa_barplots.qzv

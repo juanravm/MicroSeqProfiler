@@ -8,7 +8,7 @@
 #' @param format Format of the imput sequences suitable with qiime2 importing
 #' formats
 #' @param trim_left Number of nucleotides removed from the start of the read
-#' @param trunc_length Reads truncation length
+#' @param trunc_length Reads truncation length (maximum length of reads)
 #' @param cores Number of available cores to the program
 #' 
 #' @return QC-seq.qza QIIME2 artifact with QC unique sequences
@@ -54,7 +54,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo "Opción inválida: $1"
+            echo "Error in option: $1"
             exit 1
             ;;
     esac
@@ -64,8 +64,9 @@ echo "Raw sequences folder: $input_path"
 echo "QIIME2 type: $type"
 echo "QIIME2 format: $format"
 echo "$trim_left nt removed left"
-echo "$trunc_length nt removed right"
+echo "Truncation length: $trunc_length nt "
 echo "$cores cores employed"
+
 
 ## Import fastq files to QIIME2: In a FastqFiles folder
 mkdir intermediate
@@ -74,17 +75,17 @@ qiime tools import \
   --type $type \
   --input-path $input_path \
   --input-format $format \
-  --output-path intermediate/Raw.qza
+  --output-path ./intermediate/Raw.qza
 
 ## Summary of the imported fastq
 qiime demux summarize \
-  --i-data intermediate/Raw.qza \
-  --o-visualization intermediate/Raw.qzv
+  --i-data ./intermediate/Raw.qza \
+  --o-visualization ./intermediate/Raw.qzv
 
 
 ## QIIME2 Quality Control:
-qiime QC denoise-single \
-  --i-demultiplexed-seqs intermediate/Raw.qza \
+qiime dada2 denoise-single \
+  --i-demultiplexed-seqs ./intermediate/Raw.qza \
   --p-trim-left $trim_left \
   --p-trunc-len $trunc_length \
   --p-n-threads $cores \
@@ -92,7 +93,7 @@ qiime QC denoise-single \
   --o-table QC-table.qza \
   --o-denoising-stats QC-stats.qza
 
-qiime metadata tabulate \	
+qiime metadata tabulate \
   --m-input-file QC-stats.qza \
   --o-visualization QC-stats.qzv
 

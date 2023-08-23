@@ -48,11 +48,11 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --ref_group)
-            ref_group="$2"
+            ref_group="\"$2"\"
             shift 2
             ;;
         --group2)
-            group2="$2"
+            group2="\"$2"\"
             shift 2
             ;;
         --minimum_LDA)
@@ -87,8 +87,10 @@ sed -i '1d' LEfSe/species.tsv
 ## We must eliminate "#OTU ID" from 1st cell for LEfSe input
 # First cell substitution to "id"
 sed -i '1s/^[^\t]*/id/' LEfSe/species.tsv
-species=realpath LEfSe/species.tsv
-LEfSe=realpath LEfSe/
+species=\"$(realpath LEfSe/species.tsv)\"
+LEfSe=\"$(realpath LEfSe/)\"
+metadata_fp=\"$metadata_fp\"
+
 Rscript - <<RSCRIPT
 library(lefser)
 
@@ -131,7 +133,7 @@ Lefse<-lefser(
   trim.names = F
 )
 
-write.table(Lefse, file = paste("$LEfSe", "/LEfSe_output.tsv"), 
+write.table(Lefse, file = paste("$LEfSe", "/LEfSe_output.tsv", sep=""), 
             sep = "\t", 
             quote = FALSE, 
             row.names = F, 

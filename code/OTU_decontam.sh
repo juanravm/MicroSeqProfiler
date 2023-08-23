@@ -24,7 +24,7 @@
 OTU_filtered_table=""
 neg=""
 output_dir=""
-metadata=""
+metadata_fp=""
 taxonomy=""
 
 # Argument assign to variables
@@ -35,15 +35,15 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --neg)
-            neg="$2"
+            neg="\"$2\""
             shift 2
             ;;
         --output_dir)
             output_dir="$2"
             shift 2
             ;;
-        --metadata)
-            metadata="$2"
+        --metadata_fp)
+            metadata_fp="$2"
             shift 2
             ;;
         --taxonomy)
@@ -59,7 +59,7 @@ done
 
 echo "OTU table file path: $OTU_filtered_table"
 echo "Output directory: $output_dir"
-echo "Metadata file path: $metadata"
+echo "Metadata file path: $metadata_fp"
 echo "Negative control identification pattern: $neg"
 echo "taxonomy.qza file path: $taxonomy"
 
@@ -69,13 +69,22 @@ Rscript - <<RSCRIPT
 library(decontam)
 
 ## Importing OTU table
-OTU_table <- as.matrix(t(read.delim("$OTU_filtered_table", row.names=1)))
+OTU_table <- t(read.delim("$OTU_filtered_table", 
+header=FALSE, 
+comment.char=""))
 
-rownames(OTU_table) <- gsub("^X", "", rownames(OTU_table))
-rownames(OTU_table) <- gsub("\\.", "-", rownames(OTU_table))
+rownames(OTU_table) <- OTU_table[,1]
+OTU_table <- OTU_table[,-1]
+colnames(OTU_table) <- OTU_table[1,]
+OTU_table <- OTU_table[-1,]
+
+rownames <- rownames(OTU_table)
+OTU_table <- apply(OTU_table, 2, function(x) as.numeric(x))
+rownames(OTU_table) <- rownames
+
 
 ## Negative logical vector for controls localization
-neg <- grepl("$neg", rownames(OTU_table))
+neg <- grepl($neg, rownames(OTU_table))
 
 ## Logical vector indicating contaminants
 Contaminant <- as.logical(isContaminant(
@@ -95,23 +104,26 @@ OTU_table[,Contaminant]=0
 
 ## Exporting decontaminated table without experimental controls
 noncontam_export <- OTU_table[!neg ,]
+file <- paste("$output_dir", "/decontam_OTU_table.csv", sep = "")
 write.csv(t(noncontam_export),
           row.names = T, 
           col.names = T, 
-          file = "$output_dir/decontam_OTU_table.csv")
+          file = file)
 
 RSCRIPT
 
 # Modifying .csv to .tsv for importing
 sed -e 's/,/\t/g' $output_dir/decontam_OTU_table.csv > $output_dir/decontam_OTU_table.tsv
-sed -i '1s/^\t/#OTU ID\t/' $output_dir/intermediate/decontam_OTU_table.tsv
+sed -i '1s/^""\t/"#OTU ID"\t/' $output_dir/decontam_OTU_table.tsv
+sed -i 's/"//g' $output_dir/decontam_OTU_table.tsv
+
 rm $output_dir/decontam_OTU_table.csv
 
 # .tsv to BIOM
 biom convert \
--i $output_dir/intermediate/decontam_OTU_table.tsv \
--o $output_dir/intermediate/decontam_OTU_table.biom \
--m $metadata \
+-i $output_dir/decontam_OTU_table.tsv \
+-o $output_dir/decontam_OTU_table.biom \
+-m $metadata_fp \
 --table-type="OTU table" \
 --to-hdf5
 
@@ -122,7 +134,7 @@ qiime tools import \
 --input-format BIOMV210Format \
 --output-path $output_dir/decontam_OTU_table.qza
 
-rm $output_dir/intermediate/decontam_OTU_table.biom
+rm $output_dir/decontam_OTU_table.biom
 
 # Species taxa collapse
 qiime taxa collapse \
@@ -143,7 +155,7 @@ qiime tools export \
 # Convert biom format to tsv
 biom convert \
 -i $output_dir/feature-table.biom \
--m $metadata \
+-m $metadata_fp \
 -o $output_dir/species.txt \
 --to-tsv
 
