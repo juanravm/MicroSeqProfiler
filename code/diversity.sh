@@ -11,10 +11,10 @@
 #' 
 #' @param OTU_table OTU_table.qza QIIME2 artifact with the OTU counts
 #' 
-#' @param metadata Metadata file path
+#' @param metadata_fp Metadata file path
 #' 
 #' @param controls Metadata column character indicating experimental
-#' controls (e.g. "[Coltrols]!='Yes'", removing samples "yes" from 
+#' controls (e.g. "[Controls]!='Yes'", removing samples "yes" from 
 #' metadata column "Controls", retaining non controls)
 #' 
 #' @param sampling Minimum sampling depth to calculate diversity metrics
@@ -27,8 +27,9 @@ OTU_filtered_seqs=""
 n_trees=""
 cores=""
 OTU_table=""
-metadata=""
-controls=""
+metadata_fp=""
+column=""
+pattern=""
 sampling=""
 
 ## Arguments assign to variables
@@ -50,12 +51,16 @@ while [[ $# -gt 0 ]]; do
             OTU_table="$2"
             shift 2
             ;;
-        --metadata)
-            metadata="$2"
+        --metadata_fp)
+            metadata_fp="$2"
             shift 2
             ;;
-        --controls)
-            controls="$2"
+        --column)
+            column="$2"
+            shift 2
+            ;;
+        --pattern)
+            pattern="$2"
             shift 2
             ;;
         --sampling)
@@ -70,53 +75,54 @@ while [[ $# -gt 0 ]]; do
 done
 
 
+
 #···················· PHYLOGENETIC TREE CONSTRUCTION
 ## Reads alignment
 qiime alignment mafft \
   --i-sequences $OTU_filtered_seqs \
-  --o-alignment intermediate/aligned_rep_seqs.qza
+  --o-alignment ./intermediate/aligned_rep_seqs.qza
 
 ## Alignment mask
 qiime alignment mask \
-  --i-alignment intermediate/aligned-rep-seqs.qza \
-  --o-masked-alignment intermediate/masked_aligned_rep_seqs.qza
+  --i-alignment ./intermediate/aligned_rep_seqs.qza \
+  --o-masked-alignment ./intermediate/masked_aligned_rep_seqs.qza
 
 ## Phylogenetic tree construction
 qiime phylogeny raxml \
-  --i-alignment masked_aligned_rep_seqs.qza \
+  --i-alignment ./intermediate/masked_aligned_rep_seqs.qza \
   --p-substitution-model GTRCAT \
   --p-raxml-version SSE3 \
   --p-seed 1723 \
   --p-n-searches $n_trees \
-  --o-tree intermediate/unrooted_tree.qza \
+  --o-tree ./intermediate/unrooted_tree.qza \
   --p-n-threads $cores \
   --verbose
 
 ## Setting a midpoint root
 qiime phylogeny midpoint-root \
-   --i-tree intermediate/unrooted_tree.qza \
-   --o-rooted-tree intermediate/rooted_tree.qza
+   --i-tree ./intermediate/unrooted_tree.qza \
+   --o-rooted-tree ./intermediate/rooted_tree.qza
 
 ## Filter OTU_table to aligned sequences
 qiime phylogeny filter-table \
    --i-table $OTU_table \
-   --i-tree intermediate/rooted_tree.qza \
-   --o-filtered-table intermediate/aligned_OTU_table.qza
+   --i-tree ./intermediate/rooted_tree.qza \
+   --o-filtered-table ./intermediate/aligned_OTU_table.qza
 
 ## Filter OTU_table to remove experimental controls
 qiime feature-table filter-samples \
-  --i-table intermediate/aligned_OTU_table.qza \
-  --m-metadata-file $metadata \
-  --p-where "$controls" \
-  --o-filtered-table intermediate/aligned_OTU_table.qza
+  --i-table ./intermediate/aligned_OTU_table.qza \
+  --m-metadata-file $metadata_fp \
+  --p-where "[$column]!='$pattern'" \
+  --o-filtered-table ./intermediate/aligned_OTU_table.qza
 
 #···················· DIVERSITY METRICS CALCULATION
 ## Generating diversity metrics
 qiime diversity core-metrics-phylogenetic \
-  --i-phylogeny intermediate/rooted_tree.qza \
-  --i-table intermediate/aligned_OTU_table.qza \
+  --i-phylogeny ./intermediate/rooted_tree.qza \
+  --i-table ./intermediate/aligned_OTU_table.qza \
   --p-sampling-depth $sampling \
-  --m-metadata-file $metadata \
+  --m-metadata-file $metadata_fp \
   --output-dir diversity \
   --p-n-jobs-or-threads $cores
 

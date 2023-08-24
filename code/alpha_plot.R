@@ -39,7 +39,7 @@ for (i in seq_along(args)) {
     evenness_fp <- args[i + 1]
   } else if (args[i] == "--faith_fp") {
     faith_fp <- args[i + 1]
-  } else if (args[i] == "--metadata") {
+  } else if (args[i] == "--metadata_fp") {
     metadata_fp <- args[i + 1]
   } else if (args[i] == "--col") {
     col <- args[i + 1]
@@ -51,101 +51,104 @@ for (i in seq_along(args)) {
 output_dir <- gsub("/$", "", output_dir)
 
 ## Metadata input
-metadata <- read.delim(metadata_fp)
+metadata <- read.delim(metadata_fp, comment.char = "#")
 
 # Faith PD input
 faith.pd <- read.delim(faith_fp)
 faith.pd <- cbind(faith.pd, "Group"=metadata[, col][match(faith.pd$X, metadata$Sample.id)])
-faith.pd[,Group] <- factor(faith.pd[,Group])
+faith.pd <- faith.pd[!is.na(faith.pd[,"Group"]),]
+faith.pd[,"Group"] <- factor(faith.pd[,"Group"])
 
 # Pielou evenness input
 evenness.pd <- read.delim(evenness_fp)
-evenness.pd <- cbind(evenness.pd, Group=metadata[, Group][match(evenness.pd$X, metadata$Sample.id)])
-evenness.pd[,Group] <- factor(evenness.pd[,Group])
+evenness.pd <- cbind(evenness.pd, "Group"=metadata[, col][match(evenness.pd$X, metadata$Sample.id)])
+evenness.pd <- evenness.pd[!is.na(evenness.pd[,"Group"]),]
+evenness.pd[,"Group"] <- factor(evenness.pd[,"Group"])
 
 # Shannon input
 shannon <- read.delim(shannon_fp)
-shannon <- cbind(shannon, Group=metadata[, Group][match(shannon$X, metadata$Sample.id)])
-shannon[,Group] <- factor(shannon[,Group])
+shannon <- cbind(shannon, "Group"=metadata[, col][match(shannon$X, metadata$Sample.id)])
+shannon <- shannon[!is.na(shannon[,"Group"]),]
+shannon[,"Group"] <- factor(shannon[,"Group"])
 
 #### Kruskal-Wallis statistical test (pairwise)
 ## Comparisons dataframe creation for each metric
 # Faith PD:
 p_values1 <- c()
-for (i in 1:(length(unique(faith.pd[,Group]))-1)) {
-  for (j in (i+1):length(unique(faith.pd[,Group]))) {
+for (i in 1:(length(unique(faith.pd[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(faith.pd[,"Group"]))) {
     kruskal1 <- kruskal.test(faith_pd ~ Group, 
                              data = faith.pd, 
-                             subset = faith.pd$Cluster %in% c(levels(faith.pd[,Group])[i],levels(faith.pd[,Group])[j]))
+                             subset = faith.pd$Group %in% c(levels(faith.pd[,"Group"])[i],levels(faith.pd[,"Group"])[j]))
     p_values1 <- c(p_values1, kruskal1$p.value)}}
 
 group1 <- c()
 group2 <- c()
 
-for (i in 1:(length(unique(faith.pd[,Group]))-1)) {
-  for (j in (i+1):length(unique(faith.pd[,Group]))) {
+for (i in 1:(length(unique(faith.pd[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(faith.pd[,"Group"]))) {
     group1 <- c(group1, i)
     group2 <- c(group2, j)}}
 
-faith_pval <- data.frame(group1=levels(faith.pd[,Group])[group1],
-                            group2=levels(faith.pd[,Group])[group2],
+faith_pval <- data.frame(group1=levels(faith.pd[,"Group"])[group1],
+                            group2=levels(faith.pd[,"Group"])[group2],
                             p_values1=p_values1)
 
 write.csv(faith_pval, 
-          file = paste(output_dir, "/faith_pval.csv"), 
-          row.names = T, 
+          file = paste(output_dir, "/faith_pval.csv", sep = ""), 
+          row.names = F, 
           col.names = T)
 
 ## Pielou evenness
 p_values1 <- c()
-for (i in 1:(length(unique(evenness.pd[,Group]))-1)) {
-  for (j in (i+1):length(unique(evenness.pd[,Group]))) {
+for (i in 1:(length(unique(evenness.pd[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(evenness.pd[,"Group"]))) {
     kruskal1 <- kruskal.test(pielou_evenness ~ Group, 
                              data = evenness.pd, 
-                             subset = evenness.pd$Cluster %in% c(levels(evenness.pd[,Group])[i],levels(evenness.pd[,Group])[j]))
+                             subset = evenness.pd$Group %in% c(levels(evenness.pd[,"Group"])[i],levels(evenness.pd[,"Group"])[j]))
     p_values1 <- c(p_values1, kruskal1$p.value)}}
 
 group1 <- c()
 group2 <- c()
 
-for (i in 1:(length(unique(evenness.pd[,Group]))-1)) {
-  for (j in (i+1):length(unique(evenness.pd[,Group]))) {
+for (i in 1:(length(unique(evenness.pd[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(evenness.pd[,"Group"]))) {
     group1 <- c(group1, i)
     group2 <- c(group2, j)}}
 
-evenness_pval <- data.frame(group1=levels(evenness.pd[,Group])[group1],
-                         group2=levels(evenness.pd[,Group])[group2],
+evenness_pval <- data.frame(group1=levels(evenness.pd[,"Group"])[group1],
+                         group2=levels(evenness.pd[,"Group"])[group2],
                          p_values1=p_values1)
 
 write.csv(evenness_pval, 
-          file = paste(output_dir, "/evenness_pval.csv"), 
-          row.names = T, 
+          file = paste(output_dir, "/evenness_pval.csv", sep = ""), 
+          row.names = F, 
           col.names = T)
 
 # Shannon:
 p_values1 <- c()
-for (i in 1:(length(unique(shannon[,Group]))-1)) {
-  for (j in (i+1):length(unique(shannon[,Group]))) {
+for (i in 1:(length(unique(shannon[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(shannon[,"Group"]))) {
     kruskal1 <- kruskal.test(shannon_entropy ~ Group, 
                              data = shannon, 
-                             subset = shannon$Cluster %in% c(levels(shannon[,Group])[i],levels(shannon[,Group])[j]))
+                             subset = shannon$Group %in% c(levels(shannon[,"Group"])[i],levels(shannon[,"Group"])[j]))
     p_values1 <- c(p_values1, kruskal1$p.value)}}
 
 group1 <- c()
 group2 <- c()
 
-for (i in 1:(length(unique(shannon[,Group]))-1)) {
-  for (j in (i+1):length(unique(shannon[,Group]))) {
+for (i in 1:(length(unique(shannon[,"Group"]))-1)) {
+  for (j in (i+1):length(unique(shannon[,"Group"]))) {
     group1 <- c(group1, i)
     group2 <- c(group2, j)}}
 
-shannon_pval <- data.frame(group1=levels(shannon[,Group])[group1],
-                            group2=levels(shannon[,Group])[group2],
+shannon_pval <- data.frame(group1=levels(shannon[,"Group"])[group1],
+                            group2=levels(shannon[,"Group"])[group2],
                             p_values1=p_values1)
 
 write.csv(shannon_pval, 
-          file = paste(output_dir, "/shannon_pval.csv"), 
-          row.names = T, 
+          file = paste(output_dir, "/shannon_pval.csv", sep = ""), 
+          row.names = F, 
           col.names = T)
 
 ## Alpha diversity boxplots visualizations
@@ -157,17 +160,15 @@ names(color) <- unique(metadata[,col])
 #### Evenness boxplot
 # - Evenness Cluster comparison
 a <-ggplot(evenness.pd, aes(x=Group, y=pielou_evenness)) + 
-  geom_boxplot(fill=color[levels(evenness.pd[,Group])], color="black", width = 0.6) + 
+  geom_boxplot(fill=color[levels(evenness.pd[,"Group"])], color="black", width = 0.6) + 
   theme_linedraw() + 
   geom_dotplot(binaxis='y', stackdir='center', dotsize=0.6) +
   labs(title = "Pielou evenness", 
-       x = levels(evenness.pd[,Group]), 
+       x = element_blank(), 
        y = "Pielou evenness") +
-  theme(axis.title = element_text(face = "bold", size = 8),
-        plot.title = element_text(face = "bold", hjust = 0.5, size = 11),
-        panel.grid = element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+  theme(axis.title = element_text(face = "bold", size = 12),
+        plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
+        panel.grid = element_blank())
 
 ggsave("pielou_evenness.png",
        path = output_dir,
@@ -177,18 +178,16 @@ ggsave("pielou_evenness.png",
 
 #### Faith PD boxplot
 # - Faith PD Cluster Comparison
-b <- ggplot(faith.pd, aes(x=Cluster, y=faith_pd)) + 
-  geom_boxplot(fill=color[levels(faith.pd[,Group])], color="black", width = 0.6) + 
+b <- ggplot(faith.pd, aes(x=Group, y=faith_pd)) + 
+  geom_boxplot(fill=color[levels(faith.pd[,"Group"])], color="black", width = 0.6) + 
   theme_linedraw() + 
   geom_dotplot(binaxis='y', stackdir='center', dotsize=0.6) +
   labs(title = "Faith PD", 
-       x = levels(faith.pd[,Group]), 
+       x = element_blank(), 
        y = "Faith PD") +
-  theme(axis.title = element_text(face = "bold", size = 8),
-        plot.title = element_text(face = "bold", hjust = 0.5, size = 11),
-        panel.grid = element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+  theme(axis.title = element_text(face = "bold", size = 12),
+        plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
+        panel.grid = element_blank())
 
 ggsave("faith_pd.png",
        path = output_dir,
@@ -197,18 +196,16 @@ ggsave("faith_pd.png",
 
 #### Shannon boxplot
 # - Shannon Cluster Comparison
-c <- ggplot(shannon, aes(x=Cluster, y=shannon_entropy)) + 
-  geom_boxplot(fill=color[levels(shannon[,Group])], color="black", width = 0.6) + 
+c <- ggplot(shannon, aes(x=Group, y=shannon_entropy)) + 
+  geom_boxplot(fill=color[levels(shannon[,"Group"])], color="black", width = 0.6) + 
   theme_linedraw() + 
   geom_dotplot(binaxis='y', stackdir='center', dotsize=0.6) +
   labs(title = "Shannon index", 
-       x = levels(shannon[,Group]), 
+       x = element_blank(), 
        y = "Shannon Entropy") +
-  theme(axis.title = element_text(face = "bold", size = 8),
-        plot.title = element_text(face = "bold", hjust = 0.5, size = 11),
-        panel.grid = element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+  theme(axis.title = element_text(face = "bold", size = 12),
+        plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
+        panel.grid = element_blank())
 
 ggsave("shannon.png", 
        path = output_dir,

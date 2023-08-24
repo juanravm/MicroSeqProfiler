@@ -10,6 +10,7 @@
 #' @param trim_left Number of nucleotides removed from the start of the read
 #' @param trunc_length Reads truncation length (maximum length of reads)
 #' @param cores Number of available cores to the program
+#' @param metadata_fp Metadata file path
 #' 
 #' @return QC-seq.qza QIIME2 artifact with QC unique sequences
 #' @return QC-table.qza QIIME2 artifact with the counts of each unique 
@@ -24,6 +25,7 @@ type=""
 format=""
 trim_left=""
 trunc_length=""
+metadata_fp=""
 cores=""
 
 # Argument assign to variables
@@ -47,6 +49,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --trunc_length)
             trunc_length="$2"
+            shift 2
+            ;;
+        --metadata_fp)
+            metadata_fp="$2"
             shift 2
             ;;
         --cores)
@@ -100,3 +106,8 @@ qiime metadata tabulate \
 qiime feature-table tabulate-seqs \
   --i-data QC-seq.qza \
   --o-visualization QC-seq.qzv
+  
+qiime feature-table summarize \
+--i-table QC-table.qza \
+--o-visualization QC-table.qzv \
+--m-sample-metadata-file $metadata_fp

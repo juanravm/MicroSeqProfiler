@@ -19,8 +19,8 @@
 #' by PERMANOVA statistical test
 
 #···················· BETA DIVERSITY STATISTICS
-library(devtools)
-library(vegan)
+Sys.setenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS"=TRUE)
+require(devtools)
 library(pairwiseAdonis)
 library(dplyr)
 library(ggplot2)
@@ -51,7 +51,7 @@ for (i in seq_along(args)) {
   } else if (args[i] == "--unweighted_fp") {
     unweighted_fp <- args[i + 1]
   } else if (args[i] == "--weigthed_fp") {
-    weigthed_fp <- args[i + 1]
+    weighted_fp <- args[i + 1]
   } else if (args[i] == "--jaccard_fp") {
     jaccard_fp <- args[i + 1]
   } else if (args[i] == "--col") {
@@ -84,14 +84,21 @@ colnames(jaccard) <- rownames(jaccard)
 metadata <- metadata[(rownames(bray_curtis)) ,]
 metadata <- metadata[match(rownames(bray_curtis), rownames(metadata)) ,]
 
+# Filtering controls
+bray_curtis <- bray_curtis[!is.na(metadata[,col]),!is.na(metadata[,col])]
+unweighted <- unweighted[!is.na(metadata[,col]),!is.na(metadata[,col])]
+weighted <- weighted[!is.na(metadata[,col]),!is.na(metadata[,col])]
+jaccard <- jaccard[!is.na(metadata[,col]),!is.na(metadata[,col])]
+
 ## Comparisons vectors
+metadata <- metadata[!is.na(metadata[,col]),]
 group <- metadata[,col]
 
 # Dist object creation for pairwise.adonis() analysis
 dist_bray <- as.dist(bray_curtis, diag = F, upper = F)
-dist_unweighted <- as.dist(bray_unweighted, diag = F, upper = F)
-dist_weighted <- as.dist(bray_weighted, diag = F, upper = F)
-dist_jaccard <- as.dist(bray_jaccard, diag = F, upper = F)
+dist_unweighted <- as.dist(unweighted, diag = F, upper = F)
+dist_weighted <- as.dist(weighted, diag = F, upper = F)
+dist_jaccard <- as.dist(jaccard, diag = F, upper = F)
 
 ## Permanova statistical analysis
 permanova_bray <- pairwise.adonis(x = dist_bray,
@@ -101,7 +108,7 @@ permanova_bray <- pairwise.adonis(x = dist_bray,
                                      perm = 999)
 
 write.csv(permanova_bray, 
-          file = paste(output_dir, "/bray_pval.csv"), 
+          file = paste(output_dir, "/bray_pval.csv", sep = ""), 
           row.names = F, 
           col.names = T)
 
@@ -112,7 +119,7 @@ permanova_unweighted <- pairwise.adonis(x = dist_unweighted,
                                   perm = 999)
 
 write.csv(permanova_unweighted, 
-          file = paste(output_dir, "/unweighted_pval.csv"), 
+          file = paste(output_dir, "/unweighted_pval.csv", sep = ""), 
           row.names = F, 
           col.names = T)
 
@@ -123,7 +130,7 @@ permanova_weighted <- pairwise.adonis(x = dist_weighted,
                                   perm = 999)
 
 write.csv(permanova_weighted, 
-          file = paste(output_dir, "/weighted_pval.csv"), 
+          file = paste(output_dir, "/weighted_pval.csv", sep = ""), 
           row.names = F, 
           col.names = T)
 
@@ -134,7 +141,7 @@ permanova_jaccard <- pairwise.adonis(x = dist_jaccard,
                                   perm = 999)
 
 write.csv(permanova_jaccard, 
-          file = paste(output_dir, "/jaccard_pval.csv"), 
+          file = paste(output_dir, "/jaccard_pval.csv", sep = ""), 
           row.names = F, 
           col.names = T)
 
@@ -154,7 +161,7 @@ colnames(positions) <- c("pcoa1", "pcoa2", "pcoa3")
 positions <- as.data.frame(cbind(positions,
                                  "Group"=metadata[,col][match(rownames(positions), rownames(metadata))]))
 
-positions[,Group] <- factor(positions[,Group])
+positions[,"Group"] <- factor(positions[,"Group"])
 
 ## Percentage explained
 percent_explained <- format(round((100*PCoA$eig/sum(PCoA$eig)), digits = 1),
@@ -175,7 +182,7 @@ a <- ggplot(positions, aes(x = pcoa1, y = pcoa2, color = Group))+
        title = "Bray Curtis")+
   theme_linedraw() +
   theme(panel.grid = element_blank())+
-  scale_color_manual(values = color[levels(positions[,Group])])
+  scale_color_manual(values = color[levels(positions[,"Group"])])
 
 ggsave("bray_curtis.png",
        path = output_dir,
@@ -191,7 +198,7 @@ colnames(positions) <- c("pcoa1", "pcoa2", "pcoa3")
 positions <- as.data.frame(cbind(positions,
                                  "Group"=metadata[,col][match(rownames(positions), rownames(metadata))]))
 
-positions[,Group] <- factor(positions[,Group])
+positions[,"Group"] <- factor(positions[,"Group"])
 
 ## Percentage explained
 percent_explained <- format(round((100*PCoA$eig/sum(PCoA$eig)), digits = 1),
@@ -212,7 +219,7 @@ b <- ggplot(positions, aes(x = pcoa1, y = pcoa2, color = Group))+
        title = "Unweighted UniFrac")+
   theme_linedraw() +
   theme(panel.grid = element_blank())+
-  scale_color_manual(values = color[levels(positions[,Group])])
+  scale_color_manual(values = color[levels(positions[,"Group"])])
 
 ggsave("unweighted.png",
        path = output_dir,
@@ -228,7 +235,7 @@ colnames(positions) <- c("pcoa1", "pcoa2", "pcoa3")
 positions <- as.data.frame(cbind(positions,
                                  "Group"=metadata[,col][match(rownames(positions), rownames(metadata))]))
 
-positions[,Group] <- factor(positions[,Group])
+positions[,"Group"] <- factor(positions[,"Group"])
 
 ## Percentage explained
 percent_explained <- format(round((100*PCoA$eig/sum(PCoA$eig)), digits = 1),
@@ -249,7 +256,7 @@ c <- ggplot(positions, aes(x = pcoa1, y = pcoa2, color = Group))+
        title = "Weighted UniFrac")+
   theme_linedraw() +
   theme(panel.grid = element_blank())+
-  scale_color_manual(values = color[levels(positions[,Group])])
+  scale_color_manual(values = color[levels(positions[,"Group"])])
 
 ggsave("weighted.png",
        path = output_dir,
@@ -265,7 +272,7 @@ colnames(positions) <- c("pcoa1", "pcoa2", "pcoa3")
 positions <- as.data.frame(cbind(positions,
                                  "Group"=metadata[,col][match(rownames(positions), rownames(metadata))]))
 
-positions[,Group] <- factor(positions[,Group])
+positions[,"Group"] <- factor(positions[,"Group"])
 
 ## Percentage explained
 percent_explained <- format(round((100*PCoA$eig/sum(PCoA$eig)), digits = 1),
@@ -286,7 +293,7 @@ d <- ggplot(positions, aes(x = pcoa1, y = pcoa2, color = Group))+
        title = "Jaccard Index")+
   theme_linedraw() +
   theme(panel.grid = element_blank())+
-  scale_color_manual(values = color[levels(positions[,Group])])
+  scale_color_manual(values = color[levels(positions[,"Group"])])
 
 ggsave("jaccard.png",
        path = output_dir,
