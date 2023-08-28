@@ -119,6 +119,11 @@ qiime feature-table filter-seqs \
   --p-exclude-ids \
   --o-filtered-data OTU_filtered_seqs.qza
 
+mkdir picrust2
+qiime tools export \
+--input-path OTU_filtered_seqs.qza \
+--output-path ./picrust2/input
+
 ## QIIME2 OTU table export
 qiime tools export \
 --input-path OTU_filtered_table.qza \

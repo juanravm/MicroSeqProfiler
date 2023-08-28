@@ -134,7 +134,9 @@ qiime tools import \
 --input-format BIOMV210Format \
 --output-path $output_dir/decontam_OTU_table.qza
 
-rm $output_dir/decontam_OTU_table.biom
+mv $output_dir/decontam_OTU_table.biom ./picrust2/input/
+mv ./picrust2/input/decontam_OTU_table.biom ./picrust2/input/feature-table.biom
+
 
 # Species taxa collapse
 qiime taxa collapse \
@@ -161,3 +163,7 @@ biom convert \
 
 rm $output_dir/feature-table.biom
 mv $output_dir/species.txt $output_dir/species.tsv
+
+sed -i '1d' $output_dir/species.tsv
+sed -i '1s/^#OTU ID/id/' $output_dir/species.tsv
+mkdir $output_dir/LEfSe
