@@ -1,23 +1,28 @@
 #!/bin/bash
-
 #' Import fastq.gz files and quality control (QC)
 #'
 #' @param input_path Folder name with fastq files
+#' 
 #' @param type Type of the input sequences suitable with QIIME2 importing
 #' types
+#' 
 #' @param format Format of the imput sequences suitable with qiime2 importing
 #' formats
+#' 
 #' @param trim_left Number of nucleotides removed from the start of the read
+#' 
 #' @param trunc_length Reads truncation length (maximum length of reads)
+#' 
 #' @param cores Number of available cores to the program
+#' 
 #' @param metadata_fp Metadata file path
 #' 
 #' @return QC-seq.qza QIIME2 artifact with QC unique sequences
+#' 
 #' @return QC-table.qza QIIME2 artifact with the counts of each unique 
 #' sequence
+#' 
 #' @return QC-stats.qza QIIME2 artifact with the QC statistics
-#' 
-#' 
 
 # Variables definition
 input_path=""

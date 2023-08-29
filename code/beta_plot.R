@@ -19,8 +19,6 @@
 #' by PERMANOVA statistical test
 
 #···················· BETA DIVERSITY STATISTICS
-Sys.setenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS"=TRUE)
-require(devtools)
 library(pairwiseAdonis)
 library(dplyr)
 library(ggplot2)

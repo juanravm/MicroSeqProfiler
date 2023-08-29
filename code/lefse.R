@@ -20,6 +20,9 @@
 #' @return LEfSe_output.tsv Output with significant microorganisms
 #' LDA score 
 
+library(lefser)
+
+
 args <- commandArgs(trailingOnly = TRUE)
 
 ## Variables definition
@@ -52,8 +55,6 @@ for (i in seq_along(args)) {
     output_dir <- args[i + 1]
 }
 }
-
-library(lefser)
 
 ## Importing data
 comparison <- read.delim(species_fp, header=T, row.names = 1)
