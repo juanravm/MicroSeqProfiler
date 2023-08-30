@@ -52,6 +52,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+visualization="$(echo "$output_dir" | sed 's/[^/]*$/Visualizations')"
 
 #QIIME2 exporting sequences and feature-table :
 # input for Picrust2
@@ -67,3 +68,5 @@ python $picrust2_fp -s  $fasta \
 ## Unzip compressed outputs
 # Recursively all .gz files in the picrust2 output
 gunzip -r *.gz $output_dir
+
+mkdir $visualization
