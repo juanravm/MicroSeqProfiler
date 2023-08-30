@@ -13,9 +13,9 @@
 #' 
 #' @param metadata_fp Metadata file path
 #' 
-#' @param controls Metadata column character indicating experimental
-#' controls (e.g. "[Controls]!='Yes'", removing samples "yes" from 
-#' metadata column "Controls", retaining non controls)
+#' @param column Metadata column to indicate experimental controls 
+#' 
+#' @param pattern Character string to identify controls in metadata column
 #' 
 #' @param sampling Minimum sampling depth to calculate diversity metrics
 #' 

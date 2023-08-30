@@ -1,7 +1,7 @@
 #!/bin/bash
 #' Import fastq.gz files and quality control (QC)
 #'
-#' @param input_path Folder name with fastq files
+#' @param input_path Folder name with fastq.gz files
 #' 
 #' @param type Type of the input sequences suitable with QIIME2 importing
 #' types
@@ -13,7 +13,7 @@
 #' 
 #' @param trunc_length Reads truncation length (maximum length of reads)
 #' 
-#' @param cores Number of available cores to the program
+#' @param cores Number of processor available cores to run the program
 #' 
 #' @param metadata_fp Metadata file path
 #' 

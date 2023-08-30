@@ -1,6 +1,5 @@
 #!/bin/bash
-
-#' Import fastq.gz files and quality control (QC)
+#' OTU classification and chimera filtering
 #'
 #' @param QC_table QIIME2 FeatureTable[Frequency] artifact with 
 #' QC read counts
@@ -16,7 +15,7 @@
 #' @param class_seq Classifier reference sequences for microorganisms, usually
 #' from GreenGenes or Silva databases
 #' 
-#' @param class_tax Taxonomy associated to classifier references
+#' @param class_tax Taxonomy associated to classify references
 #' 
 #' @param metadata_fp metadata_fp file path
 #' 
