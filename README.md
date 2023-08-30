@@ -22,4 +22,4 @@ As this package depends on other packages and softwares, you must visit their of
 
 -   [*ggpicrust2* package](https://github.com/cafferychen777/ggpicrust2): *ggpicrust2* is an R package used for the these differential abundance methods and the graphical illustration of the differentially active microbial metabolic pathways.
 
-Each package has his own requirements and the installation method is explained in more detail in the [wiki web tab](https://github.com/juanravm/MicroSeqProfiler/wiki).
+Each package has his own requirements and the installation method is explained in more detail in the [GitHub wiki web tab](https://github.com/juanravm/MicroSeqProfiler/wiki).
