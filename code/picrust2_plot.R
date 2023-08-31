@@ -1,16 +1,23 @@
 #!/bin/bash
 #' OTU decontamination (Negative control normalization)
 #'
-#' @param OTU_table_fp decontam_OTU_table.qza QIIME2 artifact file path 
-#' with decontaminated OTU counts
+#' @param ref_group Reference group for pathway differential
+#' abundance analysis
 #' 
-#' @param OTU_seq_fp OTU_filtered_seqs.qza QIIME2 artifact file path 
-#' with chimera filtered sequences
+#' @param col Metadata column where groups for differential analysis are
 #' 
-#' @param  cores Number of processor cores available to the program
+#' @param  metadata_fp Metadata file path
 #' 
-#' @return output Directory with the inferred metabolic pathways matrix to
-#' KEGG Orthologs, EC and MetaCyc for each sample
+#' @param  method Select inference method for differential analysis
+#' (KO, EC or MetaCyc)
+#' 
+#' @param  picrust_dir PICRUSt2 output directory
+#' 
+#' @param Visualizations PICRUSt2 Visualizations directory
+#' 
+#' @return file in .tsv format with pathway differential abundance analysis
+#' 
+#' @return ggpicrust2 visualization with differential abundance results
 
 args <- commandArgs(trailingOnly = TRUE)
 
