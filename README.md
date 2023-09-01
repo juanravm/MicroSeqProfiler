@@ -16,7 +16,7 @@ As this package depends on other packages and softwares, you must visit their of
 
 -   [decontam package](https://github.com/benjjneb/decontam): *decontam* is an R package that performs a statistical OTU decontamination based on negative controls read counts.
   
--   [Lefser package](https://github.com/waldronlab/lefser): *Lefser* is an R package that performs taxonomic differential abundance analysis to identify differentially abundant microorganisms and infers on the effect of the abundance change in the group of samples. Bioconductor: (https://www.bioconductor.org/packages/release/bioc/html/lefser.html)
+-   [Lefser package](https://github.com/waldronlab/lefser): *Lefser* is an R package that performs taxonomic differential abundance analysis to identify differentially abundant microorganisms and infers on the effect of the abundance change in the group of samples. [Bioconductor](https://www.bioconductor.org/packages/release/bioc/html/lefser.html)
 
 -   [PICRUSt2 software](https://github.com/picrust/picrust2): PICRUSt2 is also a python based tool that infers the rest of the metagenome from the 16S marker gene sequences. This inference is performed for KEGG Orthologs and MetaCyc databases, allowing us to carry out differential abundance methods.
 
