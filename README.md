@@ -24,7 +24,8 @@ As this package depends on other packages and softwares, you must visit their of
 
 Each package has his own requirements and the installation method is explained in more detail in the [GitHub wiki web tab](https://github.com/juanravm/MicroSeqProfiler/wiki).
 
-Other dependencies: [phyloseq](https://www.bioconductor.org/packages/release/bioc/html/phyloseq.html)
+Other dependencies: [phyloseq](https://www.bioconductor.org/packages/release/bioc/html/phyloseq.html), [ALDEx2](https://bioconductor.org/packages/release/bioc/html/ALDEx2.html),[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html),
+ [Maaslin2](https://www.bioconductor.org/packages/release/bioc/html/Maaslin2.html).
 
 ## Example data
 
