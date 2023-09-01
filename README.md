@@ -14,9 +14,9 @@ As this package depends on other packages and softwares, you must visit their of
 
 -   [QIIME2 software](https://docs.qiime2.org/): QIIME2 is a python based bioinformatic tool that compiles different metagenomic programs that lets you analyze raw 16S reads of your sample. It is really useful for starting your metagenomic analysis and the diversity metrics.
 
--   [decontam package](https://github.com/benjjneb/decontam): *decontam* is an R package that performs a statistical OTU decontamination based on negative controls read counts. Bioconductor: (https://www.bioconductor.org/packages/release/bioc/html/lefser.html)
-
--   [Lefser package](https://github.com/waldronlab/lefser): *Lefser* is an R package that performs taxonomic differential abundance analysis to identify differentially abundant microorganisms and infers on the effect of the abundance change in the group of samples.
+-   [decontam package](https://github.com/benjjneb/decontam): *decontam* is an R package that performs a statistical OTU decontamination based on negative controls read counts.
+  
+-   [Lefser package](https://github.com/waldronlab/lefser): *Lefser* is an R package that performs taxonomic differential abundance analysis to identify differentially abundant microorganisms and infers on the effect of the abundance change in the group of samples. Bioconductor: (https://www.bioconductor.org/packages/release/bioc/html/lefser.html)
 
 -   [PICRUSt2 software](https://github.com/picrust/picrust2): PICRUSt2 is also a python based tool that infers the rest of the metagenome from the 16S marker gene sequences. This inference is performed for KEGG Orthologs and MetaCyc databases, allowing us to carry out differential abundance methods.
 
