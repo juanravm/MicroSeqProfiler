@@ -24,6 +24,8 @@ As this package depends on other packages and softwares, you must visit their of
 
 Each package has his own requirements and the installation method is explained in more detail in the [GitHub wiki web tab](https://github.com/juanravm/MicroSeqProfiler/wiki).
 
+Other dependencies: [phyloseq](https://www.bioconductor.org/packages/release/bioc/html/phyloseq.html)
+
 ## Example data
 
 For a better understanding of these functions, we prepared example data inputs for each script (a directory with example inputs for each function). You can obtain this example data through the following [link to Google Drive.](https://drive.google.com/drive/folders/10HhEDj57BGYD3aDi5E_5vNvG5jb54V4Q?usp=drive_link "ExampleData")
