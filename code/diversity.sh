@@ -9,7 +9,10 @@
 #'  
 #' @param cores Number of processor cores to use during the analysis
 #' 
-#' @param OTU_table OTU_table.qza QIIME2 artifact with the OTU counts
+#' @param decontam_OTU_table decontam_OTU_table.csv file path obtained 
+#' from OTU_decontam.R
+#' 
+#' @param taxonomy taxonomy.qza QIIME2 artifact file path
 #' 
 #' @param metadata_fp Metadata file path
 #' 
@@ -26,7 +29,8 @@
 OTU_filtered_seqs=""
 n_trees=""
 cores=""
-OTU_table=""
+decontam_OTU_table=""
+taxonomy=""
 metadata_fp=""
 column=""
 pattern=""
@@ -47,8 +51,8 @@ while [[ $# -gt 0 ]]; do
             cores="$2"
             shift 2
             ;;
-        --OTU_table)
-            OTU_table="$2"
+        --decontam_OTU_table)
+            decontam_OTU_table="$2"
             shift 2
             ;;
         --metadata_fp)
@@ -67,6 +71,10 @@ while [[ $# -gt 0 ]]; do
             sampling="$2"
             shift 2
             ;;
+        --taxonomy)
+            taxonomy="$2"
+            shift 2
+            ;;
         *)
             echo "Error in option: $1"
             exit 1
@@ -74,7 +82,64 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+output_dir="${decontam_OTU_table%/*}"
 
+# Modifying .csv to .tsv for importing
+sed -e 's/,/\t/g' $output_dir/decontam_OTU_table.csv > $output_dir/decontam_OTU_table.tsv
+sed -i '1s/^""\t/"#OTU ID"\t/' $output_dir/decontam_OTU_table.tsv
+sed -i 's/"//g' $output_dir/decontam_OTU_table.tsv
+
+rm $output_dir/decontam_OTU_table.csv
+
+# .tsv to BIOM
+biom convert \
+-i $output_dir/decontam_OTU_table.tsv \
+-o $output_dir/decontam_OTU_table.biom \
+-m $metadata_fp \
+--table-type="OTU table" \
+--to-hdf5
+
+## Importing decontaminated FeatureTable[Frequency] to QIIME2
+qiime tools import \
+--input-path $output_dir/decontam_OTU_table.biom \
+--type 'FeatureTable[Frequency]' \
+--input-format BIOMV210Format \
+--output-path $output_dir/decontam_OTU_table.qza
+
+OTU_table="$(realpath $output_dir/decontam_OTU_table.qza)"
+mv $output_dir/decontam_OTU_table.biom ./picrust2/input/
+mv ./picrust2/input/decontam_OTU_table.biom ./picrust2/input/feature-table.biom
+
+
+# Species taxa collapse
+qiime taxa collapse \
+    --i-table $output_dir/decontam_OTU_table.qza \
+    --i-taxonomy $taxonomy \
+    --p-level 7 \
+    --o-collapsed-table $output_dir/species.qza
+
+qiime composition add-pseudocount \
+  --i-table $output_dir/species.qza \
+  --o-composition-table $output_dir/species.qza
+  
+qiime tools export \
+   --input-path $output_dir/species.qza \
+   --output-path $output_dir
+
+
+# Convert biom format to tsv
+biom convert \
+-i $output_dir/feature-table.biom \
+-m $metadata_fp \
+-o $output_dir/species.txt \
+--to-tsv
+
+rm $output_dir/feature-table.biom
+mv $output_dir/species.txt $output_dir/species.tsv
+
+sed -i '1d' $output_dir/species.tsv
+sed -i '1s/^#OTU ID/id/' $output_dir/species.tsv
+mkdir $output_dir/LEfSe
 
 #···················· PHYLOGENETIC TREE CONSTRUCTION
 ## Reads alignment
@@ -103,13 +168,13 @@ qiime phylogeny midpoint-root \
    --i-tree ./intermediate/unrooted_tree.qza \
    --o-rooted-tree ./intermediate/rooted_tree.qza
 
-## Filter OTU_table to aligned sequences
+## Filter decontam_OTU_table to aligned sequences
 qiime phylogeny filter-table \
    --i-table $OTU_table \
    --i-tree ./intermediate/rooted_tree.qza \
    --o-filtered-table ./intermediate/aligned_OTU_table.qza
 
-## Filter OTU_table to remove experimental controls
+## Filter decontam_OTU_table to remove experimental controls
 qiime feature-table filter-samples \
   --i-table ./intermediate/aligned_OTU_table.qza \
   --m-metadata-file $metadata_fp \
