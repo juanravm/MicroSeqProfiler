@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-visualization="$(echo "$output_dir" | sed 's/[^/]*$/Visualizations')"
+visualization="$(echo "$output_dir" | sed 's/[^/]*$/Visualizations/')"
 
 #QIIME2 exporting sequences and feature-table :
 # input for Picrust2

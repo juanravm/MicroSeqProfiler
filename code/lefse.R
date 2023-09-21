@@ -75,6 +75,10 @@ comparison <- comparison[,na]
 group <- group[na]
 group <- factor(group, levels = c(ref_group, group2))
 
+filter <- !is.na(group)
+comparison <- comparison[,filter]
+group <- group[filter]
+
 # Per sample normalization to 1M reads (as Galaxy does)
 colsums<-colSums(comparison)
 
@@ -89,6 +93,8 @@ comparison <- SummarizedExperiment(assays = SimpleList(counts = comparison),
                                colData = DataFrame(grupo = group))
 
 ## LefSe calculation
+set.seed(324514)
+
 Lefse<-lefser(
   expr = comparison,
   kruskal.threshold = 0.05,
@@ -97,7 +103,8 @@ Lefse<-lefser(
   groupCol = "grupo",
   blockCol = NULL,
   assay = 1,
-  trim.names = F
+  trim.names = F,
+  checkAbundances = F
 )
 
 write.table(Lefse, file = paste(output_dir, "/LEfSe_output.tsv", sep=""), 

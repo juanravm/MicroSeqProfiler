@@ -167,6 +167,7 @@ a <-ggplot(evenness.pd, aes(x=Group, y=pielou_evenness)) +
        x = element_blank(), 
        y = "Pielou evenness") +
   theme(axis.title = element_text(face = "bold", size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 0.5),
         plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
         panel.grid = element_blank())
 
@@ -186,6 +187,7 @@ b <- ggplot(faith.pd, aes(x=Group, y=faith_pd)) +
        x = element_blank(), 
        y = "Faith PD") +
   theme(axis.title = element_text(face = "bold", size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 0.5),
         plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
         panel.grid = element_blank())
 
@@ -204,6 +206,7 @@ c <- ggplot(shannon, aes(x=Group, y=shannon_entropy)) +
        x = element_blank(), 
        y = "Shannon Entropy") +
   theme(axis.title = element_text(face = "bold", size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 0.5),
         plot.title = element_text(face = "bold", hjust = 0.5, size = 20),
         panel.grid = element_blank())
 

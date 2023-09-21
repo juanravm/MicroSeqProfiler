@@ -76,6 +76,8 @@ metadata <- metadata[!is.na(metadata[,col]),]
 
 if (method=="KO"){
   kegg_abundance <- ko2kegg_abundance(KO)
+  intersect <- intersect(colnames(kegg_abundance),metadata$sample_name)
+  metadata <- metadata[match(intersect,metadata$sample_name) ,]
   kegg_abundance <- kegg_abundance[, metadata$sample_name]
   
   group <- col
@@ -110,15 +112,6 @@ if (method=="KO"){
               row.names = F, 
               col.names = T)
   
-  a <- pathway_pca(abundance = kegg_abundance,
-              metadata = tibble(metadata),
-              group = col)
-  
-  ggsave("KO_PCA.png",
-         path = Visualizations,
-         plot = a, 
-         dpi = 320)
-  
   Group <- Group <-metadata [,col]
   
   # Removing NA in pathways name and rounding p_adjust to 5 decimals
@@ -144,6 +137,15 @@ if (method=="KO"){
          plot = p, 
          dpi = 320)
   
+  a <- pathway_pca(abundance = kegg_abundance,
+                   metadata = tibble(metadata),
+                   group = col)
+  
+  ggsave("KO_PCA.png",
+         path = Visualizations,
+         plot = a, 
+         dpi = 320)
+  
 } else if (method=="MetaCyc"){
   ## Data import
   MetaCyc_abundance <- read.table(MetaCyc, sep = "\t", header = F, row.names = NULL)
@@ -151,6 +153,8 @@ if (method=="KO"){
   colnames(MetaCyc_abundance) <- MetaCyc_abundance[1,]
   MetaCyc_abundance <- MetaCyc_abundance[-1,-1]
   
+  intersect <- intersect(colnames(MetaCyc_abundance),metadata$sample_name)
+  metadata <- metadata[match(intersect,metadata$sample_name) ,]
   MetaCyc_abundance <- MetaCyc_abundance[, metadata$sample_name]
   
   for (i in 1:ncol(MetaCyc_abundance)) {
@@ -189,15 +193,6 @@ if (method=="KO"){
               row.names = F, 
               col.names = T)
   
-  a <- pathway_pca(abundance = MetaCyc_abundance,
-                   metadata = tibble(metadata),
-                   group = col)
-  
-  ggsave("MetaCyc_PCA.png",
-         path = Visualizations,
-         plot = a, 
-         dpi = 320)
-  
   Group <-metadata[,col]
   
   Metacyc_daa_annotated_sub_method_results_df$p_adjust <- round(Metacyc_daa_annotated_sub_method_results_df$p_adjust,5)
@@ -220,6 +215,15 @@ if (method=="KO"){
          plot = p, 
          dpi = 320)
   
+  a <- pathway_pca(abundance = MetaCyc_abundance,
+                   metadata = tibble(metadata),
+                   group = col)
+  
+  ggsave("MetaCyc_PCA.png",
+         path = Visualizations,
+         plot = a, 
+         dpi = 320)
+  
 } else if (method=="EC"){
   EC_abundance <-
     read.table(EC, sep = "\t", header = F, row.names = NULL)
@@ -227,6 +231,8 @@ if (method=="KO"){
   colnames(EC_abundance) <- EC_abundance[1,]
   EC_abundance <- EC_abundance[-1,-1]
   
+  intersect <- intersect(colnames(EC_abundance),metadata$sample_name)
+  metadata <- metadata[match(intersect,metadata$sample_name) ,]
   EC_abundance <- EC_abundance[, metadata$sample_name]
   
   for (i in 1:ncol(EC_abundance)) {
@@ -265,22 +271,13 @@ if (method=="KO"){
               row.names = F, 
               col.names = T)
   
-  a <- pathway_pca(abundance = EC_abundance,
-                   metadata = tibble(metadata),
-                   group = col)
-  
-  ggsave("EC_PCA.png",
-         path = Visualizations,
-         plot = a, 
-         dpi = 320)
-  
-  EC_daa_annotated_sub_method_results_df$p_adjust <- round(EC_daa_annotated_sub_method_results_df$p_adjust,5)
+    EC_daa_annotated_sub_method_results_df$p_adjust <- round(EC_daa_annotated_sub_method_results_df$p_adjust,5)
   
   # Selecting the 20 more significant pathways in the errorbar for plotting
   low_p_feature <- EC_daa_annotated_sub_method_results_df[order(EC_daa_annotated_sub_method_results_df$p_adjust), ]$feature[1:20]
   
   Group <-metadata[,col]
-  pathway_errorbar(abundance = EC_abundance_daa,
+  p <- pathway_errorbar(abundance = EC_abundance_daa,
                    daa_results_df = EC_daa_annotated_sub_method_results_df,
                    Group = Group,
                    ko_to_kegg = F,
@@ -290,4 +287,18 @@ if (method=="KO"){
                    p_value_bar = TRUE,
                    colors = NULL,
                    x_lab = "description")
+  
+  ggsave("EC.png",
+         path = Visualizations,
+         plot = p, 
+         dpi = 320)
+  
+  a <- pathway_pca(abundance = EC_abundance,
+                   metadata = tibble(metadata),
+                   group = col)
+  
+  ggsave("EC_PCA.png",
+         path = Visualizations,
+         plot = a, 
+         dpi = 320)
 }

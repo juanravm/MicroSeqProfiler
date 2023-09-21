@@ -107,9 +107,16 @@ qiime tools import \
 --output-path $output_dir/decontam_OTU_table.qza
 
 OTU_table="$(realpath $output_dir/decontam_OTU_table.qza)"
-mv $output_dir/decontam_OTU_table.biom ./picrust2/input/
-mv ./picrust2/input/decontam_OTU_table.biom ./picrust2/input/feature-table.biom
+rm $output_dir/decontam_OTU_table.biom
 
+qiime feature-table filter-samples \
+  --i-table $output_dir/decontam_OTU_table.qza \
+  --p-min-frequency $sampling \
+  --o-filtered-table ./picrust2/picrust.qza
+  
+qiime tools export \
+--input-path ./picrust2/picrust.qza \
+--output-path ./picrust2/input
 
 # Species taxa collapse
 qiime taxa collapse \
