@@ -135,7 +135,9 @@ if (method=="KO"){
   ggsave("KO.png",
          path = Visualizations,
          plot = p, 
-         dpi = 320)
+         dpi = 320, 
+         width = 3,
+         height = 2)
   
   a <- pathway_pca(abundance = kegg_abundance,
                    metadata = tibble(metadata),
@@ -213,7 +215,9 @@ if (method=="KO"){
   ggsave("MetaCyc.png",
          path = Visualizations,
          plot = p, 
-         dpi = 320)
+         dpi = 320,
+         width = 3,
+         height = 2)
   
   a <- pathway_pca(abundance = MetaCyc_abundance,
                    metadata = tibble(metadata),
@@ -277,7 +281,7 @@ if (method=="KO"){
   low_p_feature <- EC_daa_annotated_sub_method_results_df[order(EC_daa_annotated_sub_method_results_df$p_adjust), ]$feature[1:20]
   
   Group <-metadata[,col]
-  p <- pathway_errorbar(abundance = EC_abundance_daa,
+  p <- pathway_errorbar(abundance = EC_abundance,
                    daa_results_df = EC_daa_annotated_sub_method_results_df,
                    Group = Group,
                    ko_to_kegg = F,
@@ -291,7 +295,9 @@ if (method=="KO"){
   ggsave("EC.png",
          path = Visualizations,
          plot = p, 
-         dpi = 320)
+         dpi = 320,
+         width = 3,
+         height = 2)
   
   a <- pathway_pca(abundance = EC_abundance,
                    metadata = tibble(metadata),
